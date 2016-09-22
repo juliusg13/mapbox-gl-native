@@ -8,9 +8,11 @@
 #include <QPointF>
 #include <QQuickFramebufferObject>
 
+#include <QMapbox>
 #include <QQuickMapboxGLStyle>
 
 class QQuickItem;
+class QQuickMapboxGLRenderer;
 
 class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 {
@@ -57,9 +59,6 @@ public:
 
     Q_INVOKABLE void pan(int dx, int dy);
 
-    QList<QVariantMap>& layoutPropertyChanges() { return m_layoutChanges; }
-    QList<QVariantMap>& paintPropertyChanges() { return m_paintChanges; }
-
     // MapboxGL QML Type interface.
     void setStyle(QQuickMapboxGLStyle *);
     QQuickMapboxGLStyle* style() const;
@@ -70,8 +69,6 @@ public:
     void setPitch(qreal pitch);
     qreal pitch() const;
 
-    QPointF swapPan();
-
     enum SyncState {
         NothingNeedsSync = 0,
         ZoomNeedsSync    = 1 << 0,
@@ -81,8 +78,6 @@ public:
         BearingNeedsSync = 1 << 4,
         PitchNeedsSync   = 1 << 5,
     };
-
-    int swapSyncState();
 
 protected:
     // QQuickItem implementation.
@@ -103,6 +98,7 @@ public slots:
     void setCenter(const QGeoCoordinate &center);
 
 private slots:
+    void onMapChanged(QMapbox::MapChange);
     void onStyleChanged();
     void onStylePropertyUpdated(const QVariantMap &params);
 
@@ -111,7 +107,7 @@ private:
     qreal m_maximumZoomLevel = 20;
     qreal m_zoomLevel = 20;
 
-    QPointF m_pan = QPointF(0, 0);
+    QPointF m_pan;
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
@@ -124,6 +120,9 @@ private:
     qreal m_pitch = 0;
 
     int m_syncState = NothingNeedsSync;
+    bool m_styleLoaded = false;
+
+    friend class QQuickMapboxGLRenderer;
 };
 
 #endif // QQUICKMAPBOXGL_H
