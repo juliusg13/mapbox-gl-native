@@ -10,7 +10,6 @@
 
 #include <QQuickMapboxGLStyle>
 
-class QDeclarativeGeoServiceProvider;
 class QQuickItem;
 
 class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
@@ -19,15 +18,11 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 
     // Map QML Type interface implementation.
     Q_ENUMS(QGeoServiceProvider::Error)
-    Q_PROPERTY(QDeclarativeGeoServiceProvider *plugin READ plugin WRITE setPlugin NOTIFY pluginChanged)
     Q_PROPERTY(qreal minimumZoomLevel READ minimumZoomLevel WRITE setMinimumZoomLevel NOTIFY minimumZoomLevelChanged)
     Q_PROPERTY(qreal maximumZoomLevel READ maximumZoomLevel WRITE setMaximumZoomLevel NOTIFY maximumZoomLevelChanged)
     Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QGeoCoordinate center READ center WRITE setCenter NOTIFY centerChanged)
-    Q_PROPERTY(QGeoServiceProvider::Error error READ error NOTIFY errorChanged)
-    Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
     Q_PROPERTY(QGeoShape visibleRegion READ visibleRegion WRITE setVisibleRegion)
-    Q_PROPERTY(bool copyrightsVisible READ copyrightsVisible WRITE setCopyrightsVisible NOTIFY copyrightsVisibleChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
     // MapboxGL QML Type interface.
@@ -43,9 +38,6 @@ public:
     virtual Renderer *createRenderer() const Q_DECL_FINAL;
 
     // Map QML Type interface implementation.
-    void setPlugin(QDeclarativeGeoServiceProvider *plugin);
-    QDeclarativeGeoServiceProvider *plugin() const;
-
     void setMinimumZoomLevel(qreal minimumZoomLevel);
     qreal minimumZoomLevel() const;
 
@@ -57,14 +49,8 @@ public:
 
     QGeoCoordinate center() const;
 
-    QGeoServiceProvider::Error error() const;
-    QString errorString() const;
-
     void setVisibleRegion(const QGeoShape &shape);
     QGeoShape visibleRegion() const;
-
-    void setCopyrightsVisible(bool visible);
-    bool copyrightsVisible() const;
 
     void setColor(const QColor &color);
     QColor color() const;
@@ -107,12 +93,6 @@ signals:
     void maximumZoomLevelChanged();
     void zoomLevelChanged(qreal zoomLevel);
     void centerChanged(const QGeoCoordinate &coordinate);
-
-    // Compatibility with Map QML Type, but no-op.
-    void pluginChanged(QDeclarativeGeoServiceProvider *plugin);
-    void errorChanged();
-    void copyrightLinkActivated(const QString &link);
-    void copyrightsVisibleChanged(bool visible);
     void colorChanged(const QColor &color);
 
     void styleChanged();

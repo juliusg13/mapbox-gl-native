@@ -28,17 +28,6 @@ QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
     return renderer;
 }
 
-void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
-{
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
-}
-
-QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
-{
-    return nullptr;
-}
-
 void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
 {
     zoom = qMax(mbgl::util::MIN_ZOOM, zoom);
@@ -120,16 +109,6 @@ QGeoCoordinate QQuickMapboxGL::center() const
     return m_center;
 }
 
-QGeoServiceProvider::Error QQuickMapboxGL::error() const
-{
-    return QGeoServiceProvider::NoError;
-}
-
-QString QQuickMapboxGL::errorString() const
-{
-    return QString();
-}
-
 void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
 {
     m_visibleRegion = shape;
@@ -138,17 +117,6 @@ void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
 QGeoShape QQuickMapboxGL::visibleRegion() const
 {
     return m_visibleRegion;
-}
-
-void QQuickMapboxGL::setCopyrightsVisible(bool)
-{
-    qWarning() << __PRETTY_FUNCTION__
-        << "Not implemented.";
-}
-
-bool QQuickMapboxGL::copyrightsVisible() const
-{
-    return false;
 }
 
 void QQuickMapboxGL::setColor(const QColor &color)

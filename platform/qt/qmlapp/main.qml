@@ -89,7 +89,6 @@ ApplicationWindow {
                     pitch: pitchSlider.value
 
                     color: landColorDialog.color
-                    copyrightsVisible: true
 
                     MapboxPaintStyleProperty {
                         id: waterColor
