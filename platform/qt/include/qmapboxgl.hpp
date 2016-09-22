@@ -112,6 +112,7 @@ public:
         MapChangeWillStartRenderingMap,
         MapChangeDidFinishRenderingMap,
         MapChangeDidFinishRenderingMapFullyRendered,
+        MapChangeDidFinishLoadingStyle,
         MapChangeSourceAttributionDidChange
     };
 
