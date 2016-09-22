@@ -7,9 +7,11 @@
 #include <QGeoShape>
 #include <QPointF>
 #include <QQuickFramebufferObject>
+#include <QQmlListProperty>
 
 #include <QMapbox>
 #include <QQuickMapboxGLStyle>
+#include <QQuickMapboxGLMapParameter>
 
 class QQuickItem;
 class QQuickMapboxGLRenderer;
@@ -18,7 +20,7 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 {
     Q_OBJECT
 
-    // Map QML Type interface implementation.
+    // Map QML Type interface.
     Q_ENUMS(QGeoServiceProvider::Error)
     Q_PROPERTY(qreal minimumZoomLevel READ minimumZoomLevel WRITE setMinimumZoomLevel NOTIFY minimumZoomLevelChanged)
     Q_PROPERTY(qreal maximumZoomLevel READ maximumZoomLevel WRITE setMaximumZoomLevel NOTIFY maximumZoomLevelChanged)
@@ -31,6 +33,10 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(QQuickMapboxGLStyle *style READ style WRITE setStyle NOTIFY styleChanged)
     Q_PROPERTY(qreal bearing READ bearing WRITE setBearing NOTIFY bearingChanged)
     Q_PROPERTY(qreal pitch READ pitch WRITE setPitch NOTIFY pitchChanged)
+
+    // Proposed Qt interface - based on the example documentation below:
+    // http://doc.qt.io/qt-5/qtqml-referenceexamples-properties-example.html
+    Q_PROPERTY(QQmlListProperty<QQuickMapboxGLMapParameter> parameters READ parameters)
 
 public:
     QQuickMapboxGL(QQuickItem *parent = 0);
@@ -79,17 +85,22 @@ public:
         PitchNeedsSync   = 1 << 5,
     };
 
+    // Proposed Qt interface implementation.
+    QQmlListProperty<QQuickMapboxGLMapParameter> parameters();
+
 protected:
     // QQuickItem implementation.
     virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
 
 signals:
+    // Map QML Type signals.
     void minimumZoomLevelChanged();
     void maximumZoomLevelChanged();
     void zoomLevelChanged(qreal zoomLevel);
     void centerChanged(const QGeoCoordinate &coordinate);
     void colorChanged(const QColor &color);
 
+    // Mapbox-specific signals.
     void styleChanged();
     void bearingChanged(qreal angle);
     void pitchChanged(qreal angle);
@@ -103,6 +114,11 @@ private slots:
     void onStylePropertyUpdated(const QVariantMap &params);
 
 private:
+    static void appendParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, QQuickMapboxGLMapParameter *mapObject);
+    static int countParameters(QQmlListProperty<QQuickMapboxGLMapParameter> *prop);
+    static QQuickMapboxGLMapParameter *parameterAt(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, int index);
+    static void clearParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop);
+
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
     qreal m_zoomLevel = 20;
@@ -114,6 +130,7 @@ private:
     QColor m_color;
     QList<QVariantMap> m_layoutChanges;
     QList<QVariantMap> m_paintChanges;
+    QList<QQuickMapboxGLMapParameter*> m_parameters;
 
     QQuickMapboxGLStyle *m_style = 0;
     qreal m_bearing = 0;
