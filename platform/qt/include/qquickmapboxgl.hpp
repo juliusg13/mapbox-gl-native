@@ -10,7 +10,6 @@
 #include <QQmlListProperty>
 
 #include <QMapbox>
-#include <QQuickMapboxGLStyle>
 #include <QQuickMapboxGLMapParameter>
 
 class QQuickItem;
@@ -30,7 +29,6 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
     // MapboxGL QML Type interface.
-    Q_PROPERTY(QQuickMapboxGLStyle *style READ style WRITE setStyle NOTIFY styleChanged)
     Q_PROPERTY(qreal bearing READ bearing WRITE setBearing NOTIFY bearingChanged)
     Q_PROPERTY(qreal pitch READ pitch WRITE setPitch NOTIFY pitchChanged)
 
@@ -66,9 +64,6 @@ public:
     Q_INVOKABLE void pan(int dx, int dy);
 
     // MapboxGL QML Type interface.
-    void setStyle(QQuickMapboxGLStyle *);
-    QQuickMapboxGLStyle* style() const;
-
     void setBearing(qreal bearing);
     qreal bearing() const;
 
@@ -89,8 +84,8 @@ public:
     QQmlListProperty<QQuickMapboxGLMapParameter> parameters();
 
 protected:
-    // QQuickItem implementation.
-    virtual void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value);
+    // QQmlParserStatus implementation
+    void componentComplete() override;
 
 signals:
     // Map QML Type signals.
@@ -101,7 +96,6 @@ signals:
     void colorChanged(const QColor &color);
 
     // Mapbox-specific signals.
-    void styleChanged();
     void bearingChanged(qreal angle);
     void pitchChanged(qreal angle);
 
@@ -110,14 +104,33 @@ public slots:
 
 private slots:
     void onMapChanged(QMapbox::MapChange);
-    void onStyleChanged();
-    void onStylePropertyUpdated(const QVariantMap &params);
+    void onParameterPropertyUpdated(const QString &name);
 
 private:
     static void appendParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, QQuickMapboxGLMapParameter *mapObject);
     static int countParameters(QQmlListProperty<QQuickMapboxGLMapParameter> *prop);
     static QQuickMapboxGLMapParameter *parameterAt(QQmlListProperty<QQuickMapboxGLMapParameter> *prop, int index);
     static void clearParameter(QQmlListProperty<QQuickMapboxGLMapParameter> *prop);
+
+    struct StyleProperty {
+        enum Type {
+            Paint = 0,
+            Layout
+        };
+
+        Type type;
+        QString layer;
+        QString property;
+        QVariant value;
+        QString klass;
+    };
+
+    void processMapParameter(QQuickMapboxGLMapParameter *);
+    bool parseStyle(QQuickMapboxGLMapParameter *);
+    bool parseStyleProperty(QQuickMapboxGLMapParameter *, const QString &name);
+    bool parseStyleLayer(QQuickMapboxGLMapParameter *);
+    bool parseStyleSource(QQuickMapboxGLMapParameter *);
+    bool parseStyleFilter(QQuickMapboxGLMapParameter *);
 
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
@@ -128,11 +141,13 @@ private:
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
     QColor m_color;
-    QList<QVariantMap> m_layoutChanges;
-    QList<QVariantMap> m_paintChanges;
+    QString m_styleUrl;
+    QList<StyleProperty> m_stylePropertyChanges;
+    QList<QVariantMap> m_layerChanges;
+    QList<QVariantMap> m_sourceChanges;
+    QList<QVariantMap> m_filterChanges;
     QList<QQuickMapboxGLMapParameter*> m_parameters;
 
-    QQuickMapboxGLStyle *m_style = 0;
     qreal m_bearing = 0;
     qreal m_pitch = 0;
 
