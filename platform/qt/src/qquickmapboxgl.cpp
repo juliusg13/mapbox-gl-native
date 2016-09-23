@@ -18,7 +18,7 @@
 namespace {
 
 static const QRegularExpression s_camelCase {"([a-z0-9])([A-Z])"};
-static const QStringList s_parameterTypes = QStringList() << "style" << "paint" << "layout" << "layer" << "source" << "filter";
+static const QStringList s_parameterTypes = QStringList() << "style" << "paint" << "layout" << "layer" << "source" << "filter" << "image";
 
 } // namespace
 
@@ -219,6 +219,15 @@ void QQuickMapboxGL::onMapChanged(QMapbox::MapChange change)
     }
 }
 
+bool QQuickMapboxGL::parseImage(QQuickMapboxGLMapParameter *param)
+{
+    m_imageChanges << Image {
+        param->property("name").toString(),
+        QImage(param->property("sprite").toString())
+    };
+    return true;
+}
+
 bool QQuickMapboxGL::parseStyle(QQuickMapboxGLMapParameter *param)
 {
     QString url = param->property("url").toString();
@@ -335,6 +344,9 @@ void QQuickMapboxGL::processMapParameter(QQuickMapboxGLMapParameter *param)
     case 5: // filter
         needsUpdate |= parseStyleFilter(param);
         break;
+    case 6: // image
+        needsUpdate |= parseImage(param);
+        break;
     }
     if (needsUpdate) update();
 }
@@ -372,6 +384,9 @@ void QQuickMapboxGL::onParameterPropertyUpdated(const QString &propertyName)
         break;
     case 5: // filter
         needsUpdate |= parseStyleFilter(param);
+        break;
+    case 6: // image
+        needsUpdate |= parseImage(param);
         break;
     }
     if (needsUpdate) update();

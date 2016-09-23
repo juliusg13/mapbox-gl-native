@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="source.geojson">resources/source.geojson</file>
+        <file alias="label-arrow.svg">resources/label-arrow.svg</file>
+        <file alias="label-background.svg">resources/label-background.svg</file>
+    </qresource>
+</RCC>

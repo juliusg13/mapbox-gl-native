@@ -57,7 +57,7 @@ include_directories(
 
 # C++ app
 add_executable(mbgl-qt
-    platform/qt/app/app.qrc
+    platform/qt/common.qrc
     platform/qt/app/main.cpp
     platform/qt/app/mapwindow.cpp
     platform/qt/app/mapwindow.hpp
